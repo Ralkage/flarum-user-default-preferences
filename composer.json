@@ -19,9 +19,9 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "User default preferences",
+            "title": "User Default Preferences",
             "icon": {
-                "name": "reply-all",
+                "name": "fas fa-reply-all",
                 "backgroundColor": "#fed650",
                 "color": "#1395a5"
             }

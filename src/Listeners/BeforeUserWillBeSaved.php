@@ -2,9 +2,9 @@
 
 namespace PT\Preferences\Listeners;
 
-use Flarum\Core\Notification\NotificationSyncer;
-use Flarum\Core\User;
-use Flarum\Event\UserWillBeSaved;
+use Flarum\Notification\NotificationSyncer;
+use Flarum\User\User;
+use Flarum\User\Event\Saving;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class BeforeUserWillBeSaved
@@ -15,7 +15,6 @@ class BeforeUserWillBeSaved
             'userMentioned' => true
         ],
     ];
-
     /**
      * @var NotificationSyncer
      */
@@ -34,23 +33,20 @@ class BeforeUserWillBeSaved
      */
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(UserWillBeSaved::class, [$this, 'beforeUserWillBeSaved']);
+        $events->listen(Saving::class, [$this, 'beforeUserWillBeSaved']);
     }
 
     /**
-     * @param UserWillBeSaved $event
+     * @param Saving $event
      */
-    public function beforeUserWillBeSaved(UserWillBeSaved $event)
+    public function beforeUserWillBeSaved(Saving $event)
     {
         /** @var User $user */
         $user = $event->user;
-
-        if($user->exists) {
+        if ($user->exists) {
             return;
         }
-
-        foreach(self::getDefaultUserPreferences() as $key => $value) {
-
+        foreach (self::getDefaultUserPreferences() as $key => $value) {
             $user->setPreference($key, $value);
         }
     }
@@ -61,13 +57,11 @@ class BeforeUserWillBeSaved
     public static function getDefaultUserPreferences()
     {
         $preferences = [];
-
         foreach (self::USER_PREFERENCES as $method => $types) {
             foreach ($types as $type => $value) {
                 $preferences [User::getNotificationPreferenceKey($type, $method)] = $value;
             }
         }
-
         return $preferences;
     }
 }
